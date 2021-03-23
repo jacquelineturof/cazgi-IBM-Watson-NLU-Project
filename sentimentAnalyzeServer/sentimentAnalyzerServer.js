@@ -1,5 +1,18 @@
 const express = require('express');
+const dotenv = require('dotenv')
 const app = new express();
+dotenv.config()
+
+const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
+const { IamAuthenticator } = require('ibm-watson/auth');
+
+const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
+    version: '{version}',
+    authenticator: new IamAuthenticator({
+      apikey: process.env.API_KEY,
+    }),
+    serviceUrl: process.env.API_URL,
+  });
 
 app.use(express.static('client'))
 
