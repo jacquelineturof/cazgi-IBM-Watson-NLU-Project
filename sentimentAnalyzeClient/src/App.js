@@ -37,11 +37,12 @@ class App extends React.Component {
     this.setState({sentiment:true});
     let ret = "";
     let url = ".";
+    const value = document.getElementById("textinput").value
 
     if(this.state.mode === "url") {
-      url = url+"/url/sentiment?url="+document.getElementById("textinput").value;
+      url = url+"/url/sentiment?url="+value
     } else {
-      url = url+"/text/sentiment?text="+document.getElementById("textinput").value;
+      url = url+"/text/sentiment?text="+value;
     }
     ret = axios.get(url);
     ret.then((response)=>{
@@ -51,11 +52,11 @@ class App extends React.Component {
       this.setState({sentimentOutput:response.data});
       let output = response.data;
       if(response.data === "positive") {
-        output = <div style={{color:"green",fontSize:20}}>{response.data}</div>
+        output = <div style={{color:"green",fontSize:20}}>{value}</div>
       } else if (response.data === "negative"){
-        output = <div style={{color:"red",fontSize:20}}>{response.data}</div>
+        output = <div style={{color:"red",fontSize:20}}>{value}</div>
       } else {
-        output = <div style={{color:"orange",fontSize:20}}>{response.data}</div>
+        output = <div style={{color:"orange",fontSize:20}}>{value}</div>
       }
       this.setState({sentimentOutput:output});
     });
@@ -73,7 +74,7 @@ class App extends React.Component {
     ret = axios.get(url);
 
     ret.then((response)=>{
-      this.setState({sentimentOutput:<EmotionTable emotions={response.data}/>});
+      this.setState({sentimentOutput:<EmotionTable emotions={Object.entries(response.data)}/>});
   });
   }
   

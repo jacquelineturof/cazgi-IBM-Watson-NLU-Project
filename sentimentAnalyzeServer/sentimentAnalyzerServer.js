@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser')
 const dotenv = require('dotenv')
 const app = new express();
 dotenv.config()
@@ -7,7 +8,7 @@ const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-unde
 const { IamAuthenticator } = require('ibm-watson/auth');
 
 const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
-    version: '{version}',
+    version: process.env.API_VERSION,
     authenticator: new IamAuthenticator({
       apikey: process.env.API_KEY,
     }),
@@ -19,25 +20,110 @@ app.use(express.static('client'))
 const cors_app = require('cors');
 app.use(cors_app());
 
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+ 
+// parse application/json
+app.use(bodyParser.json())
+
 app.get("/",(req,res)=>{
+
     res.render('index.html');
   });
 
 app.get("/url/emotion", (req,res) => {
+    const { url } = req.query
+    
+    const analyzeParams = { 
+      url,
+      features: {
+        emotion: {
+          targets: [
+            'apples', 'oranges'
+          ]
+        }
+      } 
+    }
 
+      naturalLanguageUnderstanding.analyze(analyzeParams)
+  .then(analysisResults => {
+    const result = analysisResults.result.emotion.document.emotion
+    return res.send(result)
+  })
+  .catch(err => {
     return res.send({"happy":"90","sad":"10"});
+  });
+    
 });
 
 app.get("/url/sentiment", (req,res) => {
-    return res.send("url sentiment for "+req.query.url);
+  const { url } = req.query
+  
+  const analyzeParams = {
+    url,
+    features: {
+      sentiment: {
+        targets: [
+          'apples', 'oranges'
+        ]
+      }
+    }
+  }
+
+  naturalLanguageUnderstanding.analyze(analyzeParams)
+  .then(analysisResults => {
+    const result = analysisResults.result.sentiment.document.label
+    return res.send(result)
+  })
+  .catch(err => {
+    return res.send("url sentiment for "+url);
+  });
 });
 
 app.get("/text/emotion", (req,res) => {
-    return res.send({"happy":"10","sad":"90"});
+    const { text } = req.query
+    const analyzeParams = {
+      html: text,
+      features: {
+        emotion: {
+          targets: [
+            'apples', 'oranges'
+          ]
+        }
+      }
+    }
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+      const result = analysisResults.result.emotion.document.emotion
+      return res.send(result)
+    })
+    .catch(err => {
+      return res.send({"happy":"90","sad":"10"});
+    });
 });
 
 app.get("/text/sentiment", (req,res) => {
-    return res.send("text sentiment for "+req.query.text);
+    const { text } = req.query
+    const analyzeParams = {
+      html: text,
+      features: {
+        sentiment: {
+          targets: [
+            'apples', 'oranges'
+          ]
+        }
+      }
+    }
+
+    naturalLanguageUnderstanding.analyze(analyzeParams)
+    .then(analysisResults => {
+      const result = analysisResults.result.sentiment.document.label
+      return res.send(result)
+    })
+    .catch(err => {
+      return res.send("text sentiment for "+text);
+    });
 });
 
 let server = app.listen(8080, () => {
