@@ -38,9 +38,7 @@ app.get("/url/emotion", (req,res) => {
       url,
       features: {
         emotion: {
-          targets: [
-            'apples', 'oranges'
-          ]
+          targets: ['negative', 'digital']
         }
       } 
     }
@@ -51,6 +49,7 @@ app.get("/url/emotion", (req,res) => {
     return res.send(result)
   })
   .catch(err => {
+    console.log('err: ', err)
     return res.send({"happy":"90","sad":"10"});
   });
     
@@ -58,14 +57,12 @@ app.get("/url/emotion", (req,res) => {
 
 app.get("/url/sentiment", (req,res) => {
   const { url } = req.query
-  
+  console.log('url: ', url)
   const analyzeParams = {
     url,
     features: {
       sentiment: {
-        targets: [
-          'apples', 'oranges'
-        ]
+        targets: ['negative', 'digital']
       }
     }
   }
@@ -73,9 +70,12 @@ app.get("/url/sentiment", (req,res) => {
   naturalLanguageUnderstanding.analyze(analyzeParams)
   .then(analysisResults => {
     const result = analysisResults.result.sentiment.document.label
+    console.log('result: ', result)
     return res.send(result)
   })
   .catch(err => {
+
+    console.log('err: ', err)
     return res.send("url sentiment for "+url);
   });
 });
@@ -86,9 +86,7 @@ app.get("/text/emotion", (req,res) => {
       html: text,
       features: {
         emotion: {
-          targets: [
-            'apples', 'oranges'
-          ]
+          targets: ['negative', 'digital']
         }
       }
     }
@@ -99,6 +97,7 @@ app.get("/text/emotion", (req,res) => {
       return res.send(result)
     })
     .catch(err => {
+      console.log('err: ', err)
       return res.send({"happy":"90","sad":"10"});
     });
 });
@@ -109,9 +108,7 @@ app.get("/text/sentiment", (req,res) => {
       html: text,
       features: {
         sentiment: {
-          targets: [
-            'apples', 'oranges'
-          ]
+          targets: ['negative', 'digital']
         }
       }
     }
@@ -122,6 +119,7 @@ app.get("/text/sentiment", (req,res) => {
       return res.send(result)
     })
     .catch(err => {
+      console.log('err: ', err)
       return res.send("text sentiment for "+text);
     });
 });
