@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser')
 const dotenv = require('dotenv')
 const app = new express();
 dotenv.config()
@@ -20,11 +19,6 @@ app.use(express.static('client'))
 const cors_app = require('cors');
 app.use(cors_app());
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
- 
-// parse application/json
-app.use(bodyParser.json())
 
 app.get("/",(req,res)=>{
 
@@ -34,13 +28,13 @@ app.get("/",(req,res)=>{
 app.get("/url/emotion", (req,res) => {
     const { url } = req.query
     
-    const analyzeParams = { 
+    const analyzeParams = {
       url,
       features: {
         emotion: {
-          targets: ['negative', 'digital']
+          document: true
         }
-      } 
+      }
     }
 
       naturalLanguageUnderstanding.analyze(analyzeParams)
@@ -57,12 +51,12 @@ app.get("/url/emotion", (req,res) => {
 
 app.get("/url/sentiment", (req,res) => {
   const { url } = req.query
-  console.log('url: ', url)
+
   const analyzeParams = {
     url,
     features: {
       sentiment: {
-        targets: ['negative', 'digital']
+        document: true
       }
     }
   }
@@ -83,10 +77,10 @@ app.get("/url/sentiment", (req,res) => {
 app.get("/text/emotion", (req,res) => {
     const { text } = req.query
     const analyzeParams = {
-      html: text,
+      text,
       features: {
         emotion: {
-          targets: ['negative', 'digital']
+          document: true
         }
       }
     }
@@ -105,10 +99,10 @@ app.get("/text/emotion", (req,res) => {
 app.get("/text/sentiment", (req,res) => {
     const { text } = req.query
     const analyzeParams = {
-      html: text,
+      text,
       features: {
         sentiment: {
-          targets: ['negative', 'digital']
+          document: true
         }
       }
     }
